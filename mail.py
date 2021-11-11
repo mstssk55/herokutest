@@ -9,6 +9,29 @@ import base64
 from email.mime.text import MIMEText
 from apiclient import errors
 import json
+from dotenv import load_dotenv
+load_dotenv()
+
+
+
+
+if "test" in os.environ.keys():
+    mode = 0
+    token_json = os.environ["token"]
+    secret = json.loads(os.environ["credentials"])
+    sendto = os.environ["test"]
+    title = "heroku"
+else:
+    mode = 1
+    token_json = os.path.exists('token.json')
+    secret = 'js/credentials.json'
+    sendto = os.getenv('mail')
+    title = "ローカル"
+
+
+
+
+
 # 1. Gmail APIのスコープを設定
 SCOPES = ['https://www.googleapis.com/auth/gmail.send']
 # 2. メール本文の作成
@@ -30,16 +53,16 @@ def send_message(service, user_id, message):
 # 4. メインとなる処理
 # 5. アクセストークンの取得
 creds = None
-if os.environ["token"]:
-    tokenFile = json.loads(os.environ["token"])
-    with open('token.json', 'w') as f:
-        json.dump(tokenFile, f, ensure_ascii=False)
+if token_json:
+    if mode == 0:
+        tokenFile = json.loads(os.environ["token"])
+        with open('token.json', 'w') as f:
+            json.dump(tokenFile, f, ensure_ascii=False)
     creds = Credentials.from_authorized_user_file('token.json', SCOPES)
 if not creds or not creds.valid:
     if creds and creds.expired and creds.refresh_token:
         creds.refresh(Request())
     else:
-        secret = json.loads(os.environ["credentials"])
         flow = InstalledAppFlow.from_client_config(
             secret, SCOPES)
         creds = flow.run_local_server()
@@ -48,12 +71,11 @@ if not creds or not creds.valid:
 service = build('gmail', 'v1', credentials=creds)
 # 6. メール本文の作成
 sender = ''
-to = os.environ["test"]
-subject = 'メール送信自動化テスト'
+to = sendto
+subject = title
 message_text = 'メール送信の自動化テストをしています。'
 message = create_message(sender, to, subject, message_text)
 # 7. Gmail APIを呼び出してメール送信
 send_message(service, 'me', message)
 
 
-print(os.name)
