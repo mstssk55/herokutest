@@ -34,7 +34,6 @@ if os.environ["token"]:
     tokenFile = json.loads(os.environ["token"])
     with open('token.json', 'w') as f:
         json.dump(tokenFile, f, ensure_ascii=False)
-    print(tokenFile)
     creds = Credentials.from_authorized_user_file('token.json', SCOPES)
 if not creds or not creds.valid:
     if creds and creds.expired and creds.refresh_token:
@@ -46,12 +45,6 @@ if not creds or not creds.valid:
         creds = flow.run_local_server()
     with open('token.json', 'w') as token:
             token.write(creds.to_json())
-# store = file.Storage('token.json')
-# creds = store.get()
-# print(creds)
-# if not creds or creds.invalid:
-#     flow = client.flow_from_clientsecrets('js/credentials.json', SCOPES)
-#     creds = tools.run_flow(flow, store)
 service = build('gmail', 'v1', credentials=creds)
 # 6. メール本文の作成
 sender = ''
@@ -61,3 +54,6 @@ message_text = 'メール送信の自動化テストをしています。'
 message = create_message(sender, to, subject, message_text)
 # 7. Gmail APIを呼び出してメール送信
 send_message(service, 'me', message)
+
+
+print(os.name)
