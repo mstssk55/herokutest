@@ -20,31 +20,31 @@ def create_message(sender, to, subject, message_text):
 # 3. メール送信の実行
 def send_message(service, user_id, message):
     try:
-        message = (service.users().messages().send(userId=user_id, body=message)
-                   .execute())
+        message = (service.users().messages().send(userId=user_id, body=message).execute())
         print('Message Id: %s' % message['id'])
         return message
     except errors.HttpError as error:
         print('An error occurred: %s' % error)
 # 4. メインとなる処理
 # 5. アクセストークンの取得
-# creds = None
-# if os.path.exists('token.json'):
-#     creds = Credentials.from_authorized_user_file('token.json', SCOPES)
-# if not creds or not creds.valid:
-#     if creds and creds.expired and creds.refresh_token:
-#         creds.refresh(Request())
-#     else:
-#         flow = InstalledAppFlow.from_client_secrets_file(
-#             'js/credentials.json', SCOPES)
-#         creds = flow.run_local_server()
-#     with open('token.json', 'w') as token:
-#             token.write(creds.to_json())
-store = file.Storage('token.json')
-creds = store.get()
-if not creds or creds.invalid:
-    flow = client.flow_from_clientsecrets('js/credentials.json', SCOPES)
-    creds = tools.run_flow(flow, store)
+creds = None
+if os.path.exists('token.json'):
+    creds = Credentials.from_authorized_user_file('token.json', SCOPES)
+if not creds or not creds.valid:
+    if creds and creds.expired and creds.refresh_token:
+        creds.refresh(Request())
+    else:
+        flow = InstalledAppFlow.from_client_secrets_file(
+            'js/credentials.json', SCOPES)
+        creds = flow.run_local_server()
+    with open('token.json', 'w') as token:
+            token.write(creds.to_json())
+# store = file.Storage('token.json')
+# creds = store.get()
+# print(creds)
+# if not creds or creds.invalid:
+#     flow = client.flow_from_clientsecrets('js/credentials.json', SCOPES)
+#     creds = tools.run_flow(flow, store)
 service = build('gmail', 'v1', credentials=creds)
 # 6. メール本文の作成
 sender = ''
