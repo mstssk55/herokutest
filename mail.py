@@ -31,9 +31,10 @@ def send_message(service, user_id, message):
 # 5. アクセストークンの取得
 creds = None
 if os.environ["token"]:
-    tokenFile = os.environ["token"]
+    tokenFile = json.loads(os.environ["token"])
     with open('token.json', 'w') as f:
         json.dump(tokenFile, f, ensure_ascii=False)
+    print(tokenFile)
     creds = Credentials.from_authorized_user_file('token.json', SCOPES)
 if not creds or not creds.valid:
     if creds and creds.expired and creds.refresh_token:
