@@ -1,4 +1,5 @@
 import os.path
+import os
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
@@ -7,6 +8,7 @@ from oauth2client import file, client, tools
 import base64
 from email.mime.text import MIMEText
 from apiclient import errors
+import json
 # 1. Gmail APIのスコープを設定
 SCOPES = ['https://www.googleapis.com/auth/gmail.send']
 # 2. メール本文の作成
@@ -28,7 +30,10 @@ def send_message(service, user_id, message):
 # 4. メインとなる処理
 # 5. アクセストークンの取得
 creds = None
-if os.path.exists('token.json'):
+if os.environ["token"]:
+    tokenFile = os.environ["token"]
+    with open('token.json', 'w') as f:
+        json.dump(tokenFile, f, ensure_ascii=False)
     creds = Credentials.from_authorized_user_file('token.json', SCOPES)
 if not creds or not creds.valid:
     if creds and creds.expired and creds.refresh_token:
