@@ -33,7 +33,7 @@ creds = None
 if os.environ["token"]:
     tokenFile = os.environ["token"]
     with open('token.json', 'w') as f:
-        json.dump(tokenFile, f, ensure_ascii=False)
+        json.dump(tokenFile.to_json(), f, ensure_ascii=False)
     creds = Credentials.from_authorized_user_file('token.json', SCOPES)
 if not creds or not creds.valid:
     if creds and creds.expired and creds.refresh_token:
