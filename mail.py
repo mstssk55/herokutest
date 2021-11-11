@@ -40,8 +40,9 @@ if not creds or not creds.valid:
     if creds and creds.expired and creds.refresh_token:
         creds.refresh(Request())
     else:
-        flow = InstalledAppFlow.from_client_secrets_file(
-            'js/credentials.json', SCOPES)
+        secret = json.loads(os.environ["credentials"])
+        flow = InstalledAppFlow.from_client_config(
+            secret, SCOPES)
         creds = flow.run_local_server()
     with open('token.json', 'w') as token:
             token.write(creds.to_json())
@@ -54,7 +55,7 @@ if not creds or not creds.valid:
 service = build('gmail', 'v1', credentials=creds)
 # 6. メール本文の作成
 sender = ''
-to = 'mstssk55@gmail.com'
+to = os.environ["test"]
 subject = 'メール送信自動化テスト'
 message_text = 'メール送信の自動化テストをしています。'
 message = create_message(sender, to, subject, message_text)
