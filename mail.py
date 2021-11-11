@@ -3,6 +3,7 @@ from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
+from oauth2client import file, client, tools
 import base64
 from email.mime.text import MIMEText
 from apiclient import errors
@@ -27,18 +28,23 @@ def send_message(service, user_id, message):
         print('An error occurred: %s' % error)
 # 4. メインとなる処理
 # 5. アクセストークンの取得
-creds = None
-if os.path.exists('token.json'):
-    creds = Credentials.from_authorized_user_file('token.json', SCOPES)
-if not creds or not creds.valid:
-    if creds and creds.expired and creds.refresh_token:
-        creds.refresh(Request())
-    else:
-        flow = InstalledAppFlow.from_client_secrets_file(
-            'js/credentials.json', SCOPES)
-        creds = flow.run_local_server()
-    with open('token.json', 'w') as token:
-            token.write(creds.to_json())
+# creds = None
+# if os.path.exists('token.json'):
+#     creds = Credentials.from_authorized_user_file('token.json', SCOPES)
+# if not creds or not creds.valid:
+#     if creds and creds.expired and creds.refresh_token:
+#         creds.refresh(Request())
+#     else:
+#         flow = InstalledAppFlow.from_client_secrets_file(
+#             'js/credentials.json', SCOPES)
+#         creds = flow.run_local_server()
+#     with open('token.json', 'w') as token:
+#             token.write(creds.to_json())
+store = file.Storage('token.json')
+creds = store.get()
+if not creds or creds.invalid:
+    flow = client.flow_from_clientsecrets('js/credentials.json', SCOPES)
+    creds = tools.run_flow(flow, store)
 service = build('gmail', 'v1', credentials=creds)
 # 6. メール本文の作成
 sender = ''
