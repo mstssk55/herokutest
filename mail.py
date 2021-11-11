@@ -13,6 +13,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
+# 1. Gmail APIのスコープを設定
+SCOPES = ['https://www.googleapis.com/auth/gmail.send']
 
 
 if "test" in os.environ.keys():
@@ -21,19 +23,20 @@ if "test" in os.environ.keys():
     secret = json.loads(os.environ["credentials"])
     sendto = os.environ["test"]
     title = "heroku"
+    flow_secret = InstalledAppFlow.from_client_config(secret, SCOPES)
 else:
     mode = 1
     token_json = os.path.exists('token.json')
     secret = 'js/credentials.json'
     sendto = os.getenv('mail')
     title = "ローカル"
+    flow_secret = InstalledAppFlow.from_client_secrets_file(secret, SCOPES)
 
 
 
 
 
-# 1. Gmail APIのスコープを設定
-SCOPES = ['https://www.googleapis.com/auth/gmail.send']
+
 # 2. メール本文の作成
 def create_message(sender, to, subject, message_text):
     message = MIMEText(message_text)
@@ -63,8 +66,7 @@ if not creds or not creds.valid:
     if creds and creds.expired and creds.refresh_token:
         creds.refresh(Request())
     else:
-        flow = InstalledAppFlow.from_client_config(
-            secret, SCOPES)
+        flow = flow_secret
         creds = flow.run_local_server()
     with open('token.json', 'w') as token:
             token.write(creds.to_json())
